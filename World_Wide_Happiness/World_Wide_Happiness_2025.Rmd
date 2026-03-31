@@ -1,0 +1,820 @@
+---
+title: "World Happiness Report 2025"
+author: "Jamar Brown"
+date: "2025-08-24"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, 
+                      warning=FALSE, error=FALSE, comment=NA)
+## echo False means the code its self won't be shown
+
+## message False means that no messages won't popup like start up messages
+
+## warning False Suppressses warnings that might show up with a caution sign in R studio
+
+## error False Stops R from showing any error messages
+
+## comment = NA Removes the default commit prefix when an error pops out and this is usually before the output.
+```
+
+```{r, include=FALSE}
+#loading the libraries I will be using for this data analysis
+
+library(tidyverse) # A collection of packages (like dplyr, ggplot2, readr) for data manipulation, visualization, and import/export in a clean, consistent way.
+
+library(FactoMineR) # Specialized for Principal Component Analysis (PCA) and other multivariate statistical methods.
+
+library(factoextra) # Makes it easier to visualize PCA results (and other multivariate analyses) with ggplot2-based plots.
+
+library(psych) # Offers functions for psychological statistics like correlation matrices, factor analysis, and descriptive stats.
+
+library(corrplot) # Visualizes correlation matrices as heatmaps or circle plots.
+
+library(ggpubr) # Makes it easier to create publication-quality plots using ggplot2, especially with significance tests and annotations.
+
+library(skimr) # Gives pretty summaries of data frames: types, missing values, min/max/mean, etc.
+
+library(readxl) # This allows me to read excel files directly in R studio 
+
+library(tibble) # So I can make the experiment column the row names
+
+library(ggfortify)
+
+library(stringr)
+
+```
+
+```{r include = FALSE}
+dataframe <- read.csv("/Users/jamarbrown/Documents/R_studio_files/R_markdown_programs/Excel_spreadsheets_CSV/WHR25_Data_Figure_2.1.csv",header = TRUE) # read the csv from my files.
+
+# loaded the entire excel dataframe into R studio
+dataframe <- as.data.frame(dataframe) # change the csv file into an dataframe
+
+worldDataframe <- dataframe
+```
+
+```{r include=FALSE}
+any(is.na(worldDataframe)) # Checking if the data frame. has any NaN values.
+
+
+```
+
+```{r}
+datacleaned <- worldDataframe[, -c(14:ncol(worldDataframe))]
+
+# -c drops columns and I wanted the columns to be dropped to be from starting at column number 14
+
+# This is the original data frame clean with all the data which is 13 columns
+
+datacleaned2 <- drop_na(datacleaned)
+
+```
+
+```{r}
+# Make sure to explain what each of the columns are before the pca analysis because it is important for everyone to be able to understand what each of the analysis are
+
+```
+
+# Summary of the World Wide Happiness Data of 2025
+
+Below is the summary of the Principal Component Analysis of the Data.\newline
+
+```{r include = FALSE}
+numeric_columns_df <- datacleaned2 %>%
+  select_if(is.numeric)
+cleaned_numeric_columns <- drop_na(numeric_columns_df)
+
+# This is all the data that has numeric numbers this will not include the name of the 
+```
+
+```{r}
+pca_results <- prcomp(cleaned_numeric_columns,
+                                   scale = TRUE)
+
+```
+
+Below is the PCA results and the importance of each component.
+
+```{r include = TRUE}
+summary(pca_results) # summary of the PCAS
+```
+
+The names of the other 5 data that make up the **`Principal Component Analysis (PCA)`**: which listed as standard deviation, rotation, center, scale, and X as listed below which helps makes the overall principal Component Analysis.\newline
+
+Below is the overall pca results of the data regarding World Wide Happiness as of 2025
+
+```{r include = TRUE}
+print(pca_results) ## The results of each variable according to the pca results 
+```
+
+sdev = variance explained by each PC (via std devs).
+
+rotation = loadings (how variables contribute to PCs).
+
+x = the projected data (scores in PC space).
+
+center = what was subtracted from each column so everything is measured relative to its mean.
+
+scale = scaling factors (usually standardization).\newline
+
+## Standard Deviation Of The Data \newline
+
+```{r include = TRUE}
+pca_results$sdev # standard deviation of the pca results.
+
+```
+
+The standard deviation in was how spread out the data is from the mean.\newline
+
+According to the standard deviations of PC 1 (SD = 2.486) has the highest variability compared to PC 12 (SD = 0.00025).\newline
+
+## Rotation Of The Data
+
+This is also know as the matrix of variable loadings (also called `eigenvectors`). Each column corresponds to a PC, and the values tell you how strongly each original variable contributes to that PC.\newline
+
+-   Positive loading means the variable and PC move in the same direction.
+
+-   Negative loading means the variable and PC move in opposite directions.
+
+-   Larger absolute values (farther from zero) mean a stronger influence on that PC.
+
+Principle Component 1 **`PC 1`** has a lot of negative loading which means the variable and PC move in opposite directions.\newline
+
+Principle Component 2 **`PC 2`** has a balance amount of positive and negative loading.\newline
+
+Principle Component 3 **`PC 3`** has a lot of positive loading which means the variable and PC move in the same direction.\newline
+
+Principle Component 4 **`PC 4`** has a lot of positive loading which means the variable and PC move in the same direction.\newline
+
+Principle Component 5 **`PC 5`** has a balance amount of positive and negative loading.\newline
+
+Principle Component 6 **`PC 6`** has a lot of positive loading which means the variable and pc move in the same direction.
+
+Principle Component 7 **`PC 7`** has a balance amount of positive and negative loading.\newline
+
+Principle Component 8 **`PC 8`** has a lot of negative loading which means the variable and PC move in opposite directions.
+
+Principle Component 9 **`PC 9`** has a lot of positive loading which means the variable and the PC move in the same direction.\newline
+
+Principle Component 10 **`PC 10`** has a lot of positive loading and Large amounts of absolute values and has some large absolute variables which is: Year, Lowerwhisker, Upperwhisker, Explained by Log GDP per capital, Explained by Social support, Explained by Freedom to make life choices.\newline
+
+Principle Component 11 **`PC 11`** has a lot of positive loading which means the variable and the pc move in the same direction.\newline
+
+Principle Component 12 **`PC 12`** has a lot of positive loading and has the largest amount of absolute values which is listed as the variables contributing to it is: Explained by Healthy life expectancy, Year, Ladder score, Upper whisker, Lower whisker, Explained by Social support, Explained by Freedom to make life choices
+
+```{r include = TRUE}
+pca_results$rotation # The rotation of the pca results
+```
+
+## Center Of The Data
+
+```{r include = TRUE}
+pca_results$center # Center of the pca results.
+
+```
+
+## Scale Of The Data
+
+```{r include = TRUE}
+pca_results$scale # Scale of the pca results.
+```
+
+## The Data Points That Make Up The PCA Of The Data
+
+```{r include = TRUE}
+pca_results$x # makes the points that the PCA will use in the data.
+
+```
+
+# Visualization of the data
+
+Below is a Scree plot of the data
+
+```{r include = TRUE}
+fviz_eig(pca_results,
+         addlabels = TRUE,
+         ylim = c(0,70)) # This is an over all graph of the dimensions to explain the overall variance in the data.
+```
+
+The scree plot shows the total amount of dimension in the data and how each dimension affects the data.
+
+-   Dimension 1: Accounts for the most variance in the data at **`51.5%`**.
+
+-   Dimension 2: Accounts for the second highest amount of variance in the data at **`17.4`**.
+
+-   Dimension 3: Accounts for **`9.1%`** of the variance in the data.
+
+-   Dimension 4: Accounts for **`8%`** of the variance in the data.
+
+-   Dimension 5: Accounts for **`6%`** of the variance in the data.
+
+-   Dimension 6: Accounts for **`3.5%`** of the variance in the data.
+
+-   Dimension 7: Accounts for **`2.5%`** of the variance in the data.
+
+-   Dimension 8: Accounts for **`1.6%`** of the variance in the data.
+
+-   Dimension 9: Accounts for **`0.3`** of the variance in the data.
+
+-   Dimension 10: Accounts for the lowest amount of variance in the data which is **`0%`**.
+
+## Below is the cosine of the PCA which helps list out which variables contribute to the most variance in the data.
+
+```{r include = TRUE, fig.width=8, fig.height=9}
+fviz_cos2(pca_results, choice = "var", axes = 1:2)
+# Using the cosine of the variables to make a chart 
+
+```
+
+-   Lowerwhisker: Contribute to the most variance in the data.
+
+-   Ladder Score: Has the second highest contribution to the variance in the data. It is also higher than upperwhisker but lower than lowerwhisker.
+
+-   Upperwhisker: Has a higher variance than Rank but it also has a lower variance then ladder.score.
+
+-   Rank: Has a higher variance than explain by log gdp per captial but a lower variance than upperwhisker.
+
+-   Explained By Log GPD Per Captia: Has a higher variance than Year but a lower variance than rank.
+
+-   Year: Has A higher variance than Dystopia residual but a lower variance than explained by log gpg per captia.
+
+-   Dystopia Residual: Has a higher variance than explained by social support but has a lower variance than year.
+
+-   Explained By Social Support: Has a higher variance than explained by freedom to make life choices but lower than dystopia residual.
+
+-   Explained By Freedom To Make Life Choices: Has a higher variance than explained by healthy life expectancy but a lower variance than explained by social support.
+
+-   Explained By Healthy Life Expectancy: Has a higher variance than explained by perceptions of corruption but a lower variance than explained by social support.
+
+-   Explained By Perceptions Of Corruption: Has a higher variance than explained by generosity but has a lower variance than explained by healthy life expectancy.
+
+-   Explained By Generosity: Has the lowest amount of variance in the data frame.
+
+## Biplot of the data to show variance
+
+```{r fig.width=10, fig.height =8}
+fviz_pca_var(pca_results,
+             col.var = "cos2",
+             gradient.cols = c("red","turquoise", "darkorange","purple"),
+             labelsize = 5,
+             pointsize = 12,
+             repel = TRUE)
+
+```
+
+- The variables ladder score, lower whisker, explained by healthy life expectancy, and upper whisker are all 4 highly positively correlated to each other. Also, lower whisker, ladder score, and upper whisker contribute to most of the variance of data along with rank. However, rank is negatively correlated to ladder score, lower whisker and upper whisker since it is going directly opposite direction of ladder score upper whisker lower whisker. These results are shown in purple because the variables which the highest rating.
+
+- Explained by healthy life expectancy has a light greenish greyish color showing that is contributes to the data at a medium amount in terms of variance of the data.
+
+- The variables explained by freedom to make life choices, explained by log gpd per captia, explained by social support, are all highly positively correlated to each other and explained by perceptions of corruption is also positively correlated as well but less correlated. The variables are show cased in orange and dark orange as grey color that their they have an above average correlation to the data compared to the data above.
+
+- Year is negatively correlated to the variables Dystopia residual and explained by generosity and year and Dystopia residual contributes to a lot of variance of the data less than the variance of ladder score lower whisker, explained by healthy life expectancy. Year and Dystopia have a orange color showing that they have a high correlation to the data
+
+- Explained by generosity has the lowest contribution to the variance in the data that is shown because it has the lowest rating which is red.
+
+## PCA Graphs Results
+
+```{r}
+
+# Make a pca of the data results 2 by 2 to get a better representation of all of the data by each country accurartely similarly how you did the PCA of the different experiment groups at Carbon Bridge.
+
+```
+
+```{r}
+#df_subset_
+
+```
+
+```{r}
+# make the graph like you did carbonbridge but only by 2 countries at a time to make an accruate analysis.
+
+```
+
+```{r}
+
+## This will make the regression model for future predications regarding happiness 
+ model <- lm(Rank ~ Ladder.score + upperwhisker + lowerwhisker  + Explained.by..Log.GDP.per.capita  + Explained.by..Social.support + Explained.by..Freedom.to.make.life.choices + Explained.by..Generosity + Explained.by..Perceptions.of.corruption  + Dystopia...residual, data = numeric_columns_df)
+
+## This is for learning the predictions model for regression continue later after pca analysis
+```
+
+```{r}
+##This is to this out a function in r Studio
+
+pca_function <- function(pcaValue1, pcaValue2, color1, color2) {
+  ## put the 2 values of countries in the pca and filter by those 2 countries only
+  countryVscountry <- datacleaned2 %>% filter(Country.name %in% c(pcaValue1, pcaValue2))
+  
+  #making sure the data is only numeric only
+  numeric_columnsTotal <- countryVscountry %>% select_if(is.numeric)
+  
+  # scaling pca
+  pcaScaler <- prcomp(numeric_columnsTotal,
+                      scale = TRUE)
+  
+  ##checking if the function works for graphing
+
+fviz_pca_ind(pcaScaler,
+            
+             geom.ind = "point", # show points only
+             col.ind = countryVscountry  $Country.name, # color by group
+             palette = c(color1,
+                         color2),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = paste("Happiness:", pcaValue1, "vs", pcaValue2))
+
+
+}
+
+```
+
+```{r fig.width= 8, fig.height=6}
+pca_function("United States","United Kingdom", "#1B998B", "#8D5A97")
+```
+
+
+```{r fig.width= 8, fig.height=6}
+df_US_VS_UK <- datacleaned2 %>% filter(Country.name %in% c("United States", "United Kingdom"))
+
+numeric_columns1 <- df_US_VS_UK %>% select_if(is.numeric)
+
+United_States_pca <- prcomp(numeric_columns1, 
+                            scale = TRUE)
+
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(United_States_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_US_VS_UK  $Country.name, # color by group
+             palette = c("#1B998B",
+                         "#8D5A97"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the UK vs US")
+
+
+```
+
+
+
+## The happines of the United States vs the United Kingdom
+
+- **United States** exhibits a slightly smaller variance in happiness scores. 
+
+- Smaller ellipse suggests consistent happiness levels across the population, indicating that while many Americans report high happiness, there is also a significant portion experiencing lower happiness levels. 
+
+- The united states scored higher on the happiness variance because the points ellipse and points are positive for dimension 1(PCA 1) which means the primary happiness value is higher compared to the UK but their is still some people who experience some unhappiness regarding the primary happiness value.
+
+- dimension 2(PCA 2) has a lower mix of positive and negative values so for for the secondary happiness is more mixed for the happiest for the country.
+
+- **United Kingdom** shows considerably greater variance with a Larger ellipse and more  spread out data points. 
+
+- This indicates that happiness levels among the British population are more spread out and the happiness varies with low amount of happiness and others with a high amount of happiness, with more variation between the highest and lowest reported happiness scores. 
+
+- The UK ellipse is also lower on the happiest rating because the cluster is mainly on the negative of dimension 1(PCA 1) which indicates lower primary happiness value.
+
+- Dimension 2 (PCA 2) has a mix in between negative and positive happiness for secondary happiness values.
+
+
+```{r}
+df_Finland_VS_Afghanistan <- datacleaned2 %>% filter(Country.name %in% c("Finland", "Afghanistan"))
+
+numeric_columns2 <- df_Finland_VS_Afghanistan %>% select_if(is.numeric)
+
+Finland_Afghanistan_pca <- prcomp(numeric_columns2, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Finland_Afghanistan_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Finland_VS_Afghanistan $Country.name, # color by group
+             palette = c("#1B898B",
+                         "#8D2A47"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Finland vs Afghanistan")
+
+
+```
+
+
+- **Afghanistan** has a more thin wider ellipse and the points are more closely together which symbolizes how this countries happiness is varied at a normal level where some to happy or sad.
+
+- The dimension 1(PCA 1) has a both negative and positive for the primary happiness value.
+
+- The dimension 2(PCA 2) has a negative values only for dimension 2 which means that the secondary value is has a much lower value for happiness
+
+- **Finland** has a little larger ellipse and the points are a little spread out which symbolizes how this countries happiness is much more spread out so some individuals feel more sad while others feel much more happy.
+
+- The dimension (PCA 1) has a both mixed amount of happiness for the primary value of happiness because the happiness is both positive and negative.
+
+- The dimension (PCA 2) is in positive axis which means that the second happiness value contributes a lot to overall happiness.
+
+```{r}
+df_Denmark_VS_Albania <- datacleaned2 %>% filter(Country.name %in% c("Denmark", "Albania"))
+
+numeric_columns3 <- df_Denmark_VS_Albania %>% select_if(is.numeric)
+
+Denmark_Albania_pca <- prcomp(numeric_columns3, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Denmark_Albania_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Denmark_VS_Albania $Country.name, # color by group
+             palette = c("#6F581C",
+                         "#8D2A47"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Denmark vs Albania")
+
+
+```
+
+- **Albania** Has an extremely small variance of happiness where the happiness is more consistent and the amount of happiness is that some people are more happy while others show less happiness. The ellipsis is extremely thin that which shows that the variant isn't really varied.
+
+- Dimension 1(PCA 1) has a the mixed amount of happiness because the happiness is both positive and negative for dimension 1 for the primary variable for happiness.
+
+- Dimension 2(PCA 2) has a positive amount of happiness which means that the happiness from the second variable contributes most to the over all happiness for the second variable for happiness.
+
+- **Denmark** Has a much wider amount of variance of happiness where some people are extremely happy while others are much less happy based on the points. The ellipsis have is bigger which demonstrates the bigger varience for the happiness where some are a little more happy while others aren't as happy.
+
+- Dimension 1(PCA 1) has a mixed amount of variance of happiness where some people are extremely happy or others are not every happy base on the primary variable of happiness.
+
+- Dimension 2(PCA 2) has a negative amount of happiness which means that the the secondary variable of happiness contributes the most to the unhappiness based on the second variable for happiness.
+
+
+```{r}
+df_Iceland_VS_Algeria <- datacleaned2 %>% filter(Country.name %in% c("Iceland", "Algeria"))
+
+numeric_columns4 <- df_Iceland_VS_Algeria %>% select_if(is.numeric)
+
+Iceland_Algeria_pca <- prcomp(numeric_columns4, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Iceland_Algeria_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Iceland_VS_Algeria $Country.name, # color by group
+             palette = c("#3E781C",
+                         "#1A3B72"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Iceland vs Algeria")
+
+
+```
+
+- **Iceland** has a thin ellipse variance where some people experience more happiness while some people are unhappy. This is shown in the points where some are high and others are low.
+
+- Dimension 1(PCA 1) dimension 1 has a more mixed amount of happiness where some is unhappy and others are more happy.
+
+- Dimension 2(PCA 2) dimension 2 has a negative happiness which means that dimension 1 accounts for more happiness over dimension 2's happiness.
+
+- **Algeria** has a extremely thin bigger ellipse variance where of the points have a variance where it happiness rose over time from low to high.
+
+- Dimension 1(PCA 1) dimension 1 has a more mixed balanced amount of happiness because they are negative and positive.
+
+- Dimension 1(PCA 2) dimension 2 has a much higher positive amount of happiness affect compared to dimension 1.
+
+
+```{r}
+df_Sweden_VS_Argentina <- datacleaned2 %>% filter(Country.name %in% c("Sweden", "Argentina"))
+
+numeric_columns5 <- df_Sweden_VS_Argentina %>% select_if(is.numeric)
+
+Iceland_Algeria_pca <- prcomp(numeric_columns5, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Iceland_Algeria_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Sweden_VS_Argentina $Country.name, # color by group
+             palette = c("#3A328C",
+                         "#5A3B72"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Iceland vs Algeria")
+
+
+```
+
+- **Argentina** the ellipse is slightly bigger than the ellipse for Sweden which means that the happiness amount is more varied.
+
+- Dimension 1(PCA 1) has a mixed amount of positive and negative points where most are mixed for happiness amount based on the primary variable for happiness.
+
+- Dimension 2(PCA 2) has a much more positive amount for the happiness for the second most influential factor of happiness.
+
+- **Sweden** the ellipse is more thin than the ellipse for Argentina which means the points will not be as varied.
+
+- Dimension 1(PCA 1) has a more mixed amount of happiness both positive and negative for the primary .
+
+- Dimension 2(PCA 2) has a much higher positive amount of happiness for the secondary happiness variable compared to the primary variable of happiness which was more mixed.
+
+```{r}
+df_Netherlands_VS_Armenia <- datacleaned2 %>% filter(Country.name %in% c("Netherlands", "Armenia"))
+
+numeric_columns6 <- df_Netherlands_VS_Armenia %>% select_if(is.numeric)
+
+Netherlands_Armenia_pca <- prcomp(numeric_columns6, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Netherlands_Armenia_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Netherlands_VS_Armenia $Country.name, # color by group
+             palette = c("#7F328C",
+                         "#7A3B72"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Netherland vs Armenia")
+
+
+```
+
+- **Netherlands**  has a very thin ellipse which means the variance of the happiness discrepancy will be much smaller.
+
+- Dimension 1 (PCA 1) the variance for happiness is mixed where it is both positive and negative for primary variable for happiness.
+
+- Dimension 2(PCA 2) the variance for happiness is negative no positve variance for dimension 2.
+
+- **Armenia** has a wide big ellipse which means a wider discrepancy.
+
+- Dimension 1(PCA 1) the variance for happiness for the primary variable for happiness is mixed for the average happiness.
+
+- Dimension 2(PCA 2) the variance for the happiness for the secondary variable for happiness is much more positive for the average of the overall happiness.
+
+```{r}
+df_Costa_Rica_VS_Australia <- datacleaned2 %>% filter(Country.name %in% c("Costa Rica", "Australia"))
+
+numeric_columns7 <- df_Costa_Rica_VS_Australia %>% select_if(is.numeric)
+
+Costa_Rica_VS_Australia_pca <- prcomp(numeric_columns7, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Costa_Rica_VS_Australia_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Costa_Rica_VS_Australia $Country.name, # color by group
+             palette = c("#7A588F",
+                         "#9A4B72"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Costa Rica vs Australia")
+
+
+```
+
+- **Costa Rica** the ellipse is extremely big showing a extremely large discrepancy.
+
+- Dimension 1(PCA 1) the variance is both positive and negative on a more massive balanced scale based on the primary variable of happiness.
+
+- Dimension 2(PCA 2) the variance of is both positive and negative on a massive balanced scale based on the secondary variable of happiness but slightly more on the positive side of dimension 2. 
+
+- **Australia** the ellipse is a little wide but thin so the discrepancy is a smaller for happiness.
+
+- Dimension 1(PCA 1) the variance of happiness is mixed for both positive and negative for the primary variable.
+
+- Dimension 2(PCA 2) the variance of the happiness is negative but not at a large scale for the secondary variable for happiness.
+
+```{r}
+df_Norway_VS_Austria <- datacleaned2 %>% filter(Country.name %in% c("Norway", "Austria"))
+
+numeric_columns8 <- df_Norway_VS_Austria %>% select_if(is.numeric)
+
+Norway_VS_Austria_pca <- prcomp(numeric_columns8, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Norway_VS_Austria_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Norway_VS_Austria $Country.name, # color by group
+             palette = c("#9C288F",
+                         "#9B4C12"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Norway vs Austria")
+
+
+```
+
+- **Austria** has a thin but extremely wide ellipse showing that the discrepancy is smaller.
+
+- Dimension 1(PCA 1) is negative and their isn't much happiness in regard to the primary happiness variable.
+
+- Dimension 2(PCA 2) is mixed for both negative and positive but mainly negative for the secondary primary variable.
+
+- **Norway** has a much wider ellipse showing a discrepancy that is slightly smaller.
+
+- Dimension 1(PCA 1) is mixed for both positive and negative where but mainly positive in regard to the primary happiness variable.
+
+- Dimension 2(PCA 2) is mixed for both positive and negative where the secondary variable is mixed for both secondary variable of happiness.
+
+```{r}
+df_Israel_VS_Azerbaijan <- datacleaned2 %>% filter(Country.name %in% c("Israel", "Azerbaijan"))
+
+numeric_columns9 <- df_Israel_VS_Azerbaijan %>% select_if(is.numeric)
+
+Israel_VS_Azerbaijan_pca <- prcomp(numeric_columns9, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Israel_VS_Azerbaijan_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Israel_VS_Azerbaijan $Country.name, # color by group
+             palette = c("#9A117A",
+                         "#9C1C12"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Israel vs Azerbaijan")
+
+
+```
+
+- **Israel** has a more thin ellipse and the discrepancy is smaller for happiness.
+
+- Dimension 1(PCA 1) has a mixed balanced amount of happiness in regard the to the primary variable of happiness.
+
+- Dimension 2(PCA 2) has positive average of happiness for the secondary variable for happiness.
+
+- **Azerbaijan** has a more wide ellipse but not thin which means that the discrepancy is bigger for happiness.
+
+- Dimension 1(PCA 1) has a mixed balanced amount of happiness for both negative and positive average over all for the primary variable for happiness.
+
+- dimension 2(PCA 2) has a has a negative average of happiness for the secondary variable for happiness.
+
+```{r}
+df_Luxembourg_VS_Bahrain <- datacleaned2 %>% filter(Country.name %in% c("Luxembourg", "Bahrain"))
+
+numeric_columns10 <- df_Luxembourg_VS_Bahrain %>% select_if(is.numeric)
+
+Luxembourg_VS_Bahrain_pca <- prcomp(numeric_columns10, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Luxembourg_VS_Bahrain_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Luxembourg_VS_Bahrain $Country.name, # color by group
+             palette = c("#9B917A",
+                         "#9B7C12"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Luxembourg vs Bahrain")
+
+
+```
+
+- **Luxembourg** has a small ellipse where their is a small amount of discrepancy.
+
+- Dimension 1(PCA 1) has a mixed amount of happiness both negative and positive for the primary variable for happiness.
+
+- Dimension 2(PCA 2) has a positive amount of happiness for the secondary variable.
+
+- **Bahrain** has an extremely wide ellipse which accounts for the discrepancy for happiness.
+
+- Dimension 1(PCA 1) has a balance negative and positive for the primary variable of happiness.
+
+-Dimension 2(PCA 2) has a mainly negative happiness in regard to the secondary variable of happiness.
+
+```{r}
+df_Mexico_VS_Bangladesh <- datacleaned2 %>% filter(Country.name %in% c("Mexico", "Bangladesh"))
+
+numeric_columns11 <- df_Mexico_VS_Bangladesh %>% select_if(is.numeric)
+
+Mexico_VS_Bangladesh_pca <- prcomp(numeric_columns11, 
+                            scale = TRUE)
+```
+
+```{r fig.width= 8, fig.height=6}
+fviz_pca_ind(Mexico_VS_Bangladesh_pca,
+             geom.ind = "point", # show points only
+             col.ind = df_Mexico_VS_Bangladesh $Country.name, # color by group
+             palette = c("#9A717A",
+                         "#9A6F11"),
+              addEllipses = TRUE, # confidence ellipses
+              legend.title = "Countries",
+              title = "The happiness of the Mexico vs Bangladesh")
+
+
+```
+
+- **Mexico** has larger ellipse with a little bit discrepancy.
+
+- Dimension 1(PCA 1) has a mixed amount of variance for both positive and negative in regard to the primary variable for happiness.
+
+- Dimension 2(PCA 2) has a positive amount of happiness in regard to the secondary variable.
+
+- **Bangladesh** has a large but also wide ellipse with a larger amount of discrepancy.
+
+- Dimension 1(PCA 1) has a mixed amount of variance both positive and negative in regard to the primary variable for happiness.
+
+- Dimension 2(PCA 2) has a mainly negative amount of happiness in regard to the secondary variable.
+
+```{r}
+## refence for doing the pca df_subset_bacteria_growth <- df_cleaned2 %>%
+ #filter(Primary.variable.changed. %in% c("Control",
+                                        # "Buffer composition",
+                                         #"Bacteria Grown Over 4 # Days ",                                  # "Bacteria Grown Over # 3 Days ",
+                                        # "Copper Amount"))
+
+#numeric_columns7 <- df_subset_bacteria_growth %>%
+ # select_if(is.numeric)
+
+# Bacteria_pca <- prcomp(numeric_columns7,
+                             #      scale = TRUE)
+```
+
+
+```{r}
+## this is for the graphing of the figures you did at carbon brige ```{r fig.width= 8, fig.height=6}
+# fviz_pca_ind(Fliter_Temp,
+            # geom.ind = "point", # show points only
+             #col.ind = df_subset_filter # $Primary.variable.changed., # color by group
+           #  palette = c("#1B998B",
+                      #   "#EDAE49",
+                       #  "#D1495B",
+                      #   "#00798C",
+                       #  "#30638E",
+                       #  "#8D5A97"),
+            # addEllipses = TRUE, # confidence ellipses
+            # legend.title = "Primary Variable Changed",
+            # title = "Sixth Experiment Group")
+
+```
+
+```{r} 
+
+# command + shift + C will add a hashtag in the front of each line in R studio
+
+# ```{r fig.width= 8, fig.height=6}
+# fviz_pca_ind(flow_rate_silicon,
+             # geom.ind = "point", # show points only
+             # col.ind = df_subset_flow $Primary.variable.changed., # color by group
+             # palette = c("#E63946",  
+          # "#333333",  
+          # "#457B9D",  
+          # "#2A9D8F",  
+          # "#FFB703",  
+          # "#8E44AD"),
+             # addEllipses = TRUE, # confidence ellipses
+             # legend.title = "Primary Variable Changed",
+             # title = "Fifth Experiment Group")
+
+```
+
+```{r}
+pcs <- pca_results$x # get the pca results for the columns
+```
+
+```{r}
+
+top_pcs <- pcs[, 1:3] # columns 1 to 3
+
+## This will include the pca results from columns 1 2 and 3 which contribute to the most of the date and will help with the predictability for the future.
+```
+
+
+```{r}
+
+```
+
+*Based on PCA analysis of happiness indicators, countries show different patterns of happiness distribution among their populations:*
+
+| Countries  | Happiness varied/and how happy they are
+|------------------------------------|------------------------------------|
+| United States | Happiness is more consistent it where some people experience a balanced amount of happiness |
+| United Kingdom | Happiness is more varied where some people experience more happiness a lower rate compared others a low amount of happiness at a higher rate.
+| Finland | Happiness is much more varied where some people have more extreme amount of happiness and others have a much lower amount of happiness. |
+| Afghanistan | Happiness is much more consistent and the happiness is much more balance were a few people is a little bit more happy compared to others who are a little more unhappy. |
+| Denmark | Happiness is much more varied where the overall happiness is mixed and but lower over all. |
+| Albania | Happiness is much better where happiness is more balanced and happiness is higher overall. |
+| Iceland | Happiness is much more mixed at a balanced rate where the citizens are more unhappy overall. |
+| Algeria | Happiness is more positive overall but has some areas where it is more mixed. |
+| Argentina | Happiness is more mixed on average as a national whole is high. |
+| Sweden | Happiness is mixed and the national average is lower as a whole.
+| Netherlands | Happiness is more mixed on average and the overall happiness is lower as a whole. |
+| Armenia | Happiness is more mixed as a whole but overall happiness is higher. |
+| Australia | Happiness is more mixed on average and the overall happiness is low but not on a large scale. |
+| Costa Rica | Happiness is mixed on average and the scale of happiness in multiple factors is mixed but slight higher on the positive scale. |
+| Austria | Happiness is mixed on average but mainly negative for the over all happiness. |
+| Norway | Happiness is more mixed on average and the over all happiness is on a mixed scale with high amounts of happiness and low amount of happiness. | 
+| Israel | Happiness is more mixed on average with happiness being more positive. |
+| Azerbaijan | Happiness is mixed on average with happiness being more negative. |
+| Luxembourg | Happiness is more mixed on average with happiness being positive. |
+| Bahrain | Happiness is more mixed on average with happiness being mainly negative. |
+| Mexico | Happiness is more mixed on average with happiness being positive. |
+| Bangladesh  | Happiness is more mixed on average with happiness being negative. | 
